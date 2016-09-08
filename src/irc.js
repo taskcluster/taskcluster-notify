@@ -34,6 +34,7 @@ class IRCBot {
     assert(options.password,  'options.password is required');
     assert(options.aws,       'options.aws is required');
     assert(options.queueName, 'options.queueName is required');
+    assert(options.publisher, 'options.publisher is required');
     this.client = new irc.Client(options.server, options.nick, {
       userName: options.userName,
       realName: options.realName,
@@ -43,6 +44,17 @@ class IRCBot {
       secure: true,
       debug: false,
       showErrors: true,
+    });
+    this.publisher = options.publisher;
+    this.client.addEventListener('message', (nick, to, text, message) => {
+      //this.publisher.ircMessage(...)
+      console.inspect({nick, to, text, message});
+    });
+    // Always follow invites
+    this.client.addEventListener('channel', (channel) => {
+      // TODO: We should probably strive to persist these... and leave channels
+      // that we get kicked from.
+      this.client.join(channel, () => {});
     });
     this.sqs = new aws.SQS(options.aws);
     this.queueName = options.queueName;

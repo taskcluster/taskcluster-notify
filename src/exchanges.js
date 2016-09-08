@@ -66,3 +66,51 @@ exchanges.declare({
   routingKeyBuilder:  commonRoutingKeyBuilder,
   CCBuilder:          commonCCBuilder,
 });
+
+/** IRC message exchange */
+exchanges.declare({
+  exchange:           'irc-message',
+  name:               'ircMessage',
+  title:              'IRC Messages',
+  description: [
+    'Whenever an IRC message is sent to the IRC bot, a message will be posted',
+    'on this exchange with as many of the words from the message in the',
+    'routing key as possible',
+  ].join('\n'),
+  routingKey: [
+    {
+      name:             'routingKeyKind',
+      summary:          'Identifier for the routing-key kind. This is ' +
+                        'always `\'primary\'` for the formalized routing key.',
+      constant:         'primary',
+      required:         true,
+    }, {
+      name:             'user',
+      summary:          'IRC user the message was posted by.',
+      multipleWords:    false,
+      required:         true,
+      maxSize:          32,
+    }, {
+      name:             'channel',
+      summary:          'IRC channel the message was posted in',
+      multipleWords:    false,
+      required:         false,
+      maxSize:          32,
+    }, {
+      name:             'message',
+      summary:          'First 128 bytes of the message with dots for space.',
+      multipleWords:    true,
+      maxSize:          128,
+    }
+  ],
+  schema:             'irc-message.json#',
+  messageBuilder:     m => m,
+  routingKeyBuilder:  m => {
+    return {
+      user: m.user,
+      channel: m.channel,
+      message: m.message.slice(0,128).replace(/ /g, '.'),
+    };
+  },
+  CCBuilder:          m => [],
+});

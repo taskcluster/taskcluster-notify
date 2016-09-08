@@ -86,11 +86,12 @@ let load = loader({
   },
 
   irc: {
-    requires: ['cfg'],
-    setup: async ({cfg}) => {
+    requires: ['cfg', 'publisher'],
+    setup: async ({cfg, publisher}) => {
       let client = new IRC(_.merge(cfg.irc, {
         aws: cfg.aws,
         queueName: cfg.app.sqsQueueName,
+        publisher: publisher,
       }));
       await client.start();
       return client;
