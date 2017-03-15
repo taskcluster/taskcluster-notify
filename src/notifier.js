@@ -23,7 +23,7 @@ class Notifier {
         Source: options.email,
       },
     }, options.aws));
-    this.template = new EmailTemplate(path.join(__dirname, 'templates', options.template));
+    this.template = new EmailTemplate(path.join(__dirname, 'templates', this.options.template));
     this.publisher = options.publisher;
     this.sqs = new aws.SQS(options.aws);
     this.queueUrl = this.sqs.createQueue({
