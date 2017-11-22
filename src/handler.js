@@ -5,17 +5,16 @@ let taskcluster = require('taskcluster-client');
 
 /** Handler listening for tasks that carries notifications */
 class Handler {
-  /** Construct listener given notifier, pulse credentials and queueName */
-  constructor({notifier, validator, credentials, queueName, monitor, routePrefix}) {
-    this.queue = new taskcluster.Queue();
+  constructor({notifier, validator, monitor, routePrefix, listener, queue, testing}) {
+    this.queue = queue;
 
     this.notifier = notifier;
     this.validator = validator;
     this.monitor = monitor;
     this.routePrefix = routePrefix;
 
-    // Create listener
-    this.listener = new taskcluster.PulseListener({credentials, queueName});
+    this.listener = listener;
+    this.testing = testing;
 
     // Bind to exchanges with pattern for custom routing keys
     let qe = new taskcluster.QueueEvents();
@@ -31,18 +30,20 @@ class Handler {
   }
 
   async listen() {
-    await this.listener.connect();
+    if (!this.testing) {
+      await this.listener.connect();
+    }
     await this.listener.resume();
   }
 
   async onMessage(message) {
     // Load task definition
-    let taskId = message.payload.status.taskId;
+    let {status} = message.payload;
+    let taskId = status.taskId;
     let task = await this.queue.task(taskId);
-    let status = await this.queue.status(taskId);
     let href = `https://tools.taskcluster.net/task-inspector/#${taskId}`;
     let groupHref = `https://tools.taskcluster.net/task-group-inspector/#/${task.taskGroupId}`;
-    let runCount = status.status.runs.length;
+    let runCount = status.runs.length;
 
     debug(`Received message for ${taskId} with notify routes. Finding notifications.`);
     this.monitor.count('notification-requested.any');
@@ -52,11 +53,11 @@ class Handler {
 
       // convert from on- syntax to state. e.g. on-exception -> exception
       let decider = _.join(_.slice(route[route.length -1], 3), '');
-      if (decider !== 'any' && status.status.state !== decider) {
+      if (decider !== 'any' && status.state !== decider) {
         return;
       }
 
-      let ircmessage = `Task "${task.metadata.name}" complete with status '${status.status.state}'. Inspect: ${href}`;
+      let ircmessage = `Task "${task.metadata.name}" complete with status '${status.state}'. Inspect: ${href}`;
 
       switch (route[1]) {
         case 'irc-user':
@@ -91,14 +92,14 @@ class Handler {
           let content = `
 Task [\`${taskId}\`](${href}) in task-group [\`${task.taskGroupId}\`](${groupHref}) is complete.
 
-**Status:** ${status.status.state} (in ${runCount} run${runCount === 1? '' : 's'})
+**Status:** ${status.state} (in ${runCount} run${runCount === 1? '' : 's'})
 **Name:** ${task.metadata.name}
 **Description:** ${task.metadata.description}
 **Owner:** ${task.metadata.owner}
 **Source:** ${task.metadata.source}
           `;
           let link = {text: 'Inspect Task', href};
-          let subject = `Task ${status.status.state}: ${task.metadata.name} - ${taskId}`;
+          let subject = `Task ${status.state}: ${task.metadata.name} - ${taskId}`;
           let template = 'simple';
           if (_.has(task, 'extra.notify.email')) {
             let extra = task.extra.notify.email;
