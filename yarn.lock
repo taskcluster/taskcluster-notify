@@ -2322,6 +2322,10 @@ json5@^0.5.0:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
 
+jsone@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/jsone/-/jsone-0.0.0.tgz#565938826fc606af033a0439071711c73c6c2f91"
+
 jsonify@~0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/jsonify/-/jsonify-0.0.0.tgz#2c74b6ee41d93ca51b7b5aaee8f503631d252a73"

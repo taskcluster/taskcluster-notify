@@ -55,32 +55,40 @@ class Handler {
       if (decider !== 'any' && status.status.state !== decider) {
         return;
       }
+
+      let ircmessage = `Task "${task.metadata.name}" complete with status '${status.status.state}'. Inspect: ${href}`;
+
       switch (route[1]) {
         case 'irc-user':
           this.monitor.count('notification-requested.irc-user');
+          if (_.has(task, 'extra.notify.irc-user.message')) {
+            message = jsone(_.get(task, 'extra.notify.irc-user.message'), status);
+          }
           return this.notifier.irc({
             user: route[2],
-            message: `Task "${task.metadata.name}" complete with status '${status.status.state}'. Inspect: ${href}`,
+            message: ircmessage,
           });
+
         case 'irc-channel':
           this.monitor.count('notification-requested.irc-channel');
+          if (_.has(task, 'extra.notify.irc-channel.message')) {
+            message = jsone(_.get(task, 'extra.notify.irc-user.message'), status);
+          }
           return this.notifier.irc({
             channel: route[2],
-            message: `Task "${task.metadata.name}" complete with status '${status.status.state}'. Inspect: ${href}`,
+            message: ircmessage,
           });
+
         case 'pulse':
           this.monitor.count('notification-requested.pulse');
           return this.notifier.pulse({
             routingKey: _.join(_.slice(route, 2, route.length - 1), '.'),
             message: status,
           });
+
         case 'email':
           this.monitor.count('notification-requested.email');
-          return this.notifier.email({
-            address:  _.join(_.slice(route, 2, route.length - 1), '.'),
-            // I hate having to dedent this, but it's easy and without it there's
-            // whitespace before every line, making Markdown think it's preformatted.
-            content: `
+          let content = `
 Task [\`${taskId}\`](${href}) in task-group [\`${task.taskGroupId}\`](${groupHref}) is complete.
 
 **Status:** ${status.status.state} (in ${runCount} run${runCount === 1? '' : 's'})
@@ -88,11 +96,25 @@ Task [\`${taskId}\`](${href}) in task-group [\`${task.taskGroupId}\`](${groupHre
 **Description:** ${task.metadata.description}
 **Owner:** ${task.metadata.owner}
 **Source:** ${task.metadata.source}
-            `,
-            subject: `Task ${status.status.state}: ${task.metadata.name} - ${taskId}`,
-            link: {text: 'Inspect Task', href},
-            template: 'simple',
+          `;
+          let link = {text: 'Inspect Task', href};
+          let subject = `Task ${status.status.state}: ${task.metadata.name} - ${taskId}`;
+          let template = 'simple';
+          if (_.has(task, 'extra.notify.email')) {
+            let extra = task.extra.notify.email;
+            content = email.content ? jsone(email.content, status) : content;
+            subject = email.subject ? jsone(email.subject, status) : subject;
+            link = email.link ? jsone(email.link, status) : link;
+            template = email.template ? jsone(email.template, status) : template;
+          }
+          return this.notifier.email({
+            address:  _.join(_.slice(route, 2, route.length - 1), '.'),
+            content,
+            subject,
+            link,
+            template,
           });
+
         default:
       }
     }));
