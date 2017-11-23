@@ -2414,6 +2414,10 @@ jsesc@~0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
 
+json-e@^2.3.4:
+  version "2.3.4"
+  resolved "https://registry.yarnpkg.com/json-e/-/json-e-2.3.4.tgz#49673ca14cd0a88d594434b71c6888f57b8b6ce6"
+
 json-schema-traverse@^0.3.0:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/json-schema-traverse/-/json-schema-traverse-0.3.1.tgz#349a6d44c53a51de89b40805c5d5e59b417d3340"
@@ -2439,10 +2443,6 @@ json3@^3.3.2:
 json5@^0.5.0:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-0.5.1.tgz#1eade7acc012034ad84e2396767ead9fa5495821"
-
-jsone@^0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/jsone/-/jsone-0.0.0.tgz#565938826fc606af033a0439071711c73c6c2f91"
 
 jsonify@~0.0.0:
   version "0.0.0"

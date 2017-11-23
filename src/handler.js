@@ -2,6 +2,7 @@ let debug = require('debug')('notify');
 let _ = require('lodash');
 let assert = require('assert');
 let taskcluster = require('taskcluster-client');
+let jsone = require('json-e');
 
 /** Handler listening for tasks that carries notifications */
 class Handler {
@@ -73,7 +74,7 @@ class Handler {
         case 'irc-channel':
           this.monitor.count('notification-requested.irc-channel');
           if (_.has(task, 'extra.notify.irc-channel.message')) {
-            message = jsone(_.get(task, 'extra.notify.irc-user.message'), status);
+            message = jsone(_.get(task, 'extra.notify.irc-channel.message'), status);
           }
           return this.notifier.irc({
             channel: route[2],

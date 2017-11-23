@@ -112,7 +112,9 @@ suite('Handler', () => {
       assert.equal(body.channel, '#taskcluster-test');
     });
     let route = 'test-notify.irc-channel.#taskcluster-test.on-any';
-    queue.task = sinon.stub().returns(makeTask([route]));
+    let task = makeTask([route]);
+    task.extra = {notify: {'irc-channel': {message: 'it worked with taskid'}}};
+    queue.task = sinon.stub().returns(task);
     listener.fakeMessage({
       payload: {
         status: baseStatus,
