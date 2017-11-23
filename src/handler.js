@@ -58,27 +58,27 @@ class Handler {
         return;
       }
 
-      let ircmessage = `Task "${task.metadata.name}" complete with status '${status.state}'. Inspect: ${href}`;
+      let ircMessage = `Task "${task.metadata.name}" complete with status '${status.state}'. Inspect: ${href}`;
 
       switch (route[1]) {
         case 'irc-user':
           this.monitor.count('notification-requested.irc-user');
-          if (_.has(task, 'extra.notify.irc-user.message')) {
-            message = jsone(_.get(task, 'extra.notify.irc-user.message'), status);
+          if (_.has(task, 'extra.notify.ircUserMessage')) {
+            ircMessage = jsone(task.extra.notify.ircUserMessage, {task, status});
           }
           return this.notifier.irc({
             user: route[2],
-            message: ircmessage,
+            message: ircMessage,
           });
 
         case 'irc-channel':
           this.monitor.count('notification-requested.irc-channel');
-          if (_.has(task, 'extra.notify.irc-channel.message')) {
-            message = jsone(_.get(task, 'extra.notify.irc-channel.message'), status);
+          if (_.has(task, 'extra.notify.ircChannelMessage')) {
+            ircMessage = jsone(task.extra.notify.ircChannelMessage, {task, status});
           }
           return this.notifier.irc({
             channel: route[2],
-            message: ircmessage,
+            message: ircMessage,
           });
 
         case 'pulse':
@@ -104,10 +104,10 @@ Task [\`${taskId}\`](${href}) in task-group [\`${task.taskGroupId}\`](${groupHre
           let template = 'simple';
           if (_.has(task, 'extra.notify.email')) {
             let extra = task.extra.notify.email;
-            content = email.content ? jsone(email.content, status) : content;
-            subject = email.subject ? jsone(email.subject, status) : subject;
-            link = email.link ? jsone(email.link, status) : link;
-            template = email.template ? jsone(email.template, status) : template;
+            content = email.content ? jsone(email.content, {task, status}) : content;
+            subject = email.subject ? jsone(email.subject, {task, status}) : subject;
+            link = email.link ? jsone(email.link, {task, status}) : link;
+            template = email.template ? jsone(email.template, {task, status}) : template;
           }
           return this.notifier.email({
             address:  _.join(_.slice(route, 2, route.length - 1), '.'),

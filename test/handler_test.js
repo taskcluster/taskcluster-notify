@@ -110,10 +110,11 @@ suite('Handler', () => {
   test('irc', async (done) => {
     helper.checkSqsMessage(helper.sqsQueueUrl, done, body => {
       assert.equal(body.channel, '#taskcluster-test');
+      assert.equal(body.message, 'it worked with taskid DKPZPsvvQEiw67Pb3rkdNg');
     });
     let route = 'test-notify.irc-channel.#taskcluster-test.on-any';
     let task = makeTask([route]);
-    task.extra = {notify: {'irc-channel': {message: 'it worked with taskid'}}};
+    task.extra = {notify: {ircChannelMessage: 'it worked with taskid ${status.taskId}'}};
     queue.task = sinon.stub().returns(task);
     listener.fakeMessage({
       payload: {
