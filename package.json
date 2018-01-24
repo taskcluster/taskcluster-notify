@@ -23,7 +23,6 @@
     "json-e": "^2.3.4",
     "lodash": "^4.11.1",
     "marked": "^0.3.5",
-    "mocha": "^2.2.1",
     "node-sass": "^3.8.0",
     "promise": "^7.1.1",
     "pug": "^2.0.0-beta5",
@@ -35,7 +34,6 @@
     "taskcluster-lib-docs": "^4.1.1",
     "taskcluster-lib-loader": "^2.0.0",
     "taskcluster-lib-monitor": "^4.6.3",
-    "taskcluster-lib-testing": "^1.0.1",
     "taskcluster-lib-validate": "^3.0.3",
     "typed-env-config": "^2.0.0"
   },
@@ -45,6 +43,8 @@
     "yarn": "^1.0.0"
   },
   "devDependencies": {
-    "sinon": "^4.1.2"
+    "mocha": "^5.0.0",
+    "sinon": "^4.1.2",
+    "taskcluster-lib-testing": "^2.0.2"
   }
 }

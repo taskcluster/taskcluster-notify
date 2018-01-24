@@ -28,8 +28,8 @@ if (!cfg.pulse || !cfg.aws) {
   process.exit(1);
 }
 
-helper.checkSqsMessage = (queueUrl, done, check) => {
-  helper.sqs.receiveMessage({
+helper.checkSqsMessage = (queueUrl, check) => {
+  return helper.sqs.receiveMessage({
     QueueUrl:             queueUrl,
     AttributeNames:       ['ApproximateReceiveCount'],
     MaxNumberOfMessages:  10,
@@ -43,8 +43,7 @@ helper.checkSqsMessage = (queueUrl, done, check) => {
       ReceiptHandle:  m[0].ReceiptHandle,
     }).promise();
     check(JSON.parse(m[0].Body));
-    done();
-  }).catch(done);
+  });
 };
 
 let webServer = null;
