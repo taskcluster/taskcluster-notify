@@ -5,7 +5,7 @@ suite('Handler', () => {
   let testing = require('taskcluster-lib-testing');
   let sinon = require('sinon');
   let helper = require('./helper');
-  let load = require('../lib/main');
+  let load = require('../src/main');
 
   let publisher;
   let listener;

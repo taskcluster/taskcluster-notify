@@ -7,9 +7,9 @@ let aws         = require('aws-sdk');
 let taskcluster = require('taskcluster-client');
 let config      = require('typed-env-config');
 let testing     = require('taskcluster-lib-testing');
-let api         = require('../lib/api');
-let exchanges   = require('../lib/exchanges');
-let load        = require('../lib/main');
+let api         = require('../src/api');
+let exchanges   = require('../src/exchanges');
+let load        = require('../src/main');
 
 // Load configuration
 let cfg = config({profile: 'test'});
