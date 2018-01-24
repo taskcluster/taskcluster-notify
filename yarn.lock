@@ -233,6 +233,20 @@ asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
 
+aws-sdk@^2.142.0:
+  version "2.186.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.186.0.tgz#64eccea5bf0449810323c313d9cb41c2a4a2850d"
+  dependencies:
+    buffer "4.9.1"
+    events "^1.1.1"
+    jmespath "0.15.0"
+    querystring "0.2.0"
+    sax "1.2.1"
+    url "0.10.3"
+    uuid "3.1.0"
+    xml2js "0.4.17"
+    xmlbuilder "4.2.1"
+
 aws-sdk@^2.148.0:
   version "2.155.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.155.0.tgz#2ae5381f97e8f42e650e1d25999e9090a936d0c6"
@@ -1946,19 +1960,19 @@ js-tokens@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.1.tgz#08e9f132484a2c45a30907e9dc4d5567b7f114d7"
 
+js-yaml@^3.10.0, js-yaml@^3.9.1:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.10.0.tgz#2e78441646bd4682e963f22b6e92823c309c62dc"
+  dependencies:
+    argparse "^1.0.7"
+    esprima "^4.0.0"
+
 js-yaml@^3.5.3, js-yaml@^3.6.1:
   version "3.8.2"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.8.2.tgz#02d3e2c0f6beab20248d412c352203827d786721"
   dependencies:
     argparse "^1.0.7"
     esprima "^3.1.1"
-
-js-yaml@^3.9.1:
-  version "3.10.0"
-  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.10.0.tgz#2e78441646bd4682e963f22b6e92823c309c62dc"
-  dependencies:
-    argparse "^1.0.7"
-    esprima "^4.0.0"
 
 jsbn@~0.1.0:
   version "0.1.1"
@@ -3080,13 +3094,13 @@ right-align@^0.1.1:
   dependencies:
     align-text "^0.1.1"
 
-rimraf@2, rimraf@^2.5.2:
+rimraf@2:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.1.tgz#c2338ec643df7a1b7fe5c54fa86f57428a55f33d"
   dependencies:
     glob "^7.0.5"
 
-rimraf@^2.2.8:
+rimraf@^2.2.8, rimraf@^2.6.2:
   version "2.6.2"
   resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-2.6.2.tgz#2ed8150d24a16ea8651e6d6ef0f47c4158ce7a36"
   dependencies:
@@ -3676,20 +3690,20 @@ taskcluster-lib-validate@^1.1.1:
     url-join "^1.1.0"
     walk "^2.3.9"
 
-taskcluster-lib-validate@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/taskcluster-lib-validate/-/taskcluster-lib-validate-2.1.0.tgz#c55de6cf905409f95e907ff7f96a2f440fbb77be"
+taskcluster-lib-validate@^3.0.3:
+  version "3.0.3"
+  resolved "https://registry.yarnpkg.com/taskcluster-lib-validate/-/taskcluster-lib-validate-3.0.3.tgz#3b09ccda1a205e728009bafb60f2eb0a11e10a85"
   dependencies:
-    ajv "^4.0.4"
+    ajv "^5.3.0"
     app-root-dir "^1.0.2"
-    aws-sdk "^2.5.3"
-    babel-runtime "^6.0.0"
-    debug "^2.2.0"
-    js-yaml "^3.5.3"
+    aws-sdk "^2.142.0"
+    babel-runtime "^6.26.0"
+    debug "^3.1.0"
+    js-yaml "^3.10.0"
     lodash "^4.5.1"
-    promise "^7.0.4"
-    rimraf "^2.5.2"
-    url-join "^1.1.0"
+    promise "^8.0.1"
+    rimraf "^2.6.2"
+    url-join "^2.0.2"
     walk "^2.3.9"
 
 templayed@*:
@@ -3854,6 +3868,10 @@ url-join@^0.0.1:
 url-join@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/url-join/-/url-join-1.1.0.tgz#741c6c2f4596c4830d6718460920d0c92202dc78"
+
+url-join@^2.0.2:
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/url-join/-/url-join-2.0.5.tgz#5af22f18c052a000a48d7b82c5e9c2e2feeda728"
 
 url-parse-lax@^1.0.0:
   version "1.0.0"
