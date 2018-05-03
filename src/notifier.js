@@ -42,25 +42,33 @@ class Notifier {
     return _.indexOf(this.hashCache, this.key(idents)) !== -1;
   }
 
+  /**
+   * Return the rate limit for this address, meaning the number of emails after
+   * this one before we begin discarding.  If the result is -1, then this message
+   * should be discarded (and will not count against the rate limit)
+   */
   rateLimit(address) {
     if (!(address in this.sendTimes)) {
       this.sendTimes[address] = [];
     }
     const sendTimes = this.sendTimes[address];
 
-    // discard any old send times, and add the new one
+    // discard any expired send times
     const startTime = new Date();
     startTime.setSeconds(startTime.getSeconds() - this.options.maxMessageTime);
     while (sendTimes.length && sendTimes[0] < startTime) {
       sendTimes.shift();
     }
-    sendTimes.push(new Date());
+    const remaining = this.options.maxMessageCount - sendTimes.length;
 
-    if (sendTimes.length > this.options.maxMessageCount) {
-      return true; // start rate-limiting
+    // track this new message, if not already over the deadline
+    if (remaining > 0) {
+      sendTimes.push(new Date());
     }
 
-    return false;
+    // note that we treat 0 remaining as meaning this recipient is at its limit,
+    // but still allowed to send this one last email..
+    return remaining - 1;
   }
 
   markSent(...idents) {
@@ -80,8 +88,9 @@ class Notifier {
       return;
     }
 
-    if (this.rateLimit(address)) {
-      debug('Ratelimited email: %s is over its rate limit, discarding the notification, link: %s', address, link);
+    const rateLimit = this.rateLimit(address);
+    if (rateLimit < 0) {
+      debug('Ratelimited email: %s is over its rate limit, discarding the notification', address);
       return;
     }
 
@@ -98,7 +107,7 @@ class Notifier {
     });
 
     let tmpl = new EmailTemplate(path.join(__dirname, 'templates', template || 'simple'));
-    let mail = await tmpl.render({address, subject, content, formatted, link});
+    let mail = await tmpl.render({address, subject, content, formatted, link, rateLimit});
     let html = mail.html;
     content = mail.text;
     subject = mail.subject;

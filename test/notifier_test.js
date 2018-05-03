@@ -35,7 +35,7 @@ suite('notifier_test.js', function() {
 
   suite('rateLimit', function() {
     test('does not rate-limit a single send', function() {
-      assert.equal(notifier.rateLimit('foo@taskcluster.net'), false);
+      assert(notifier.rateLimit('foo@taskcluster.net') >= 0);
     });
 
     test('does rate-limit sends at higher than 5 per 10 seconds', function() {
@@ -45,18 +45,24 @@ suite('notifier_test.js', function() {
         return notifier.rateLimit('foo@taskcluster.net');
       });
       assert.deepEqual(limited, [
-        false, false, false, false, false, // five not limited
-        true, true, true, true, true, // remainder limited
+        4, 3, 2, 1, 0, // five not limited
+        -1, -1, -1, -1, -1, // remainder limited
       ]);
     });
 
-    test('lifts the rate limit after maxMessageTime', function() {
-      // send at 1 per second..
-      _.range(10).forEach(() => {
+    test('lifts the rate limit maxMessageTime after a message is sent', function() {
+      // send 3 all at once
+      _.range(3).forEach(() => {
         notifier.rateLimit('foo@taskcluster.net');
       });
-      timeFlies(11);
-      assert(!notifier.rateLimit('foo@taskcluster.net'));
+      // 5 seconds later, another 2
+      timeFlies(5);
+      _.range(2).forEach(() => {
+        notifier.rateLimit('foo@taskcluster.net');
+      });
+      // 7 seconds later, we should have 2 remaining after sending another
+      timeFlies(7);
+      assert.equal(notifier.rateLimit('foo@taskcluster.net'), 2);
     });
   });
 });
