@@ -106,6 +106,8 @@ let load = loader({
       queueName: cfg.app.sqsQueueName,
       emailBlacklist: cfg.app.emailBlacklist,
       publisher,
+      maxMessageCount: cfg.app.maxMessageCount,
+      maxMessageTime: cfg.app.maxMessageTime,
     }),
   },
 

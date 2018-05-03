@@ -28,6 +28,7 @@ class Notifier {
     this.queueUrl = this.sqs.createQueue({
       QueueName:  this.options.queueName,
     }).promise().then(req => req.QueueUrl);
+    this.sendTimes = {};
   }
 
   key(idents) {
@@ -41,6 +42,27 @@ class Notifier {
     return _.indexOf(this.hashCache, this.key(idents)) !== -1;
   }
 
+  rateLimit(address) {
+    if (!(address in this.sendTimes)) {
+      this.sendTimes[address] = [];
+    }
+    const sendTimes = this.sendTimes[address];
+
+    // discard any old send times, and add the new one
+    const startTime = new Date();
+    startTime.setSeconds(startTime.getSeconds() - this.options.maxMessageTime);
+    while (sendTimes.length && sendTimes[0] < startTime) {
+      sendTimes.shift();
+    }
+    sendTimes.push(new Date());
+
+    if (sendTimes.length > this.options.maxMessageCount) {
+      return true; // start rate-limiting
+    }
+
+    return false;
+  }
+
   markSent(...idents) {
     this.hashCache.unshift(this.key(idents));
     this.hashCache = _.take(this.hashCache, 1000);
@@ -51,11 +73,18 @@ class Notifier {
       debug('Duplicate email send detected. Not attempting resend.');
       return;
     }
+
     // Don't notify emails on the blacklist
     if (this.options.emailBlacklist.includes(address)) {
       debug('Blacklist email: %s send detected, discarding the notification', address);
       return;
     }
+
+    if (this.rateLimit(address)) {
+      debug('Ratelimited email: %s is over its rate limit, discarding the notification, link: %s', address, link);
+      return;
+    }
+
     debug(`Sending email to ${address}`);
     // It is very, very important that this uses the sanitize option
     let formatted  = marked(content, {
