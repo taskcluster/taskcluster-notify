@@ -73,8 +73,8 @@ suite('Handler', () => {
   };
 
   test('pulse', async () => {
-    let result = publisher.on('fakePublish', ({CCs}) => {
-      assert.deepEqual(CCs, ['route.notify-test']);
+    let published = new Promise(resolve => {
+      publisher.once('fakePublish', resolve);
     });
 
     let route = 'test-notify.pulse.notify-test.on-any';
@@ -87,7 +87,9 @@ suite('Handler', () => {
       routingKey: 'doesnt-matter',
       routes: [route],
     });
-    return result;
+
+    const {CCs} = await published;
+    assert.deepEqual(CCs, ['route.notify-test']);
   });
 
   test('email', async () => {
