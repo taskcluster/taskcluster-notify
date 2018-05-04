@@ -6,6 +6,7 @@ let aws = require('aws-sdk');
 let crypto = require('crypto');
 let marked = require('marked');
 let EmailTemplate = require('email-templates').EmailTemplate;
+let RateLimit = require('./ratelimit');
 
 /**
  * Object to send notifications, so the logic can be re-used in both the pulse
@@ -28,7 +29,7 @@ class Notifier {
     this.queueUrl = this.sqs.createQueue({
       QueueName:  this.options.queueName,
     }).promise().then(req => req.QueueUrl);
-    this.sendTimes = {};
+    this.rateLimit = options.rateLimit;
   }
 
   key(idents) {
@@ -40,35 +41,6 @@ class Notifier {
 
   isDuplicate(...idents) {
     return _.indexOf(this.hashCache, this.key(idents)) !== -1;
-  }
-
-  /**
-   * Return the rate limit for this address, meaning the number of emails after
-   * this one before we begin discarding.  If the result is -1, then this message
-   * should be discarded (and will not count against the rate limit)
-   */
-  rateLimit(address) {
-    if (!(address in this.sendTimes)) {
-      this.sendTimes[address] = [];
-    }
-    const sendTimes = this.sendTimes[address];
-
-    // discard any expired send times
-    const startTime = new Date();
-    startTime.setSeconds(startTime.getSeconds() - this.options.maxMessageTime);
-    while (sendTimes.length && sendTimes[0] < startTime) {
-      sendTimes.shift();
-    }
-    const remaining = this.options.maxMessageCount - sendTimes.length;
-
-    // track this new message, if not already over the deadline
-    if (remaining > 0) {
-      sendTimes.push(new Date());
-    }
-
-    // note that we treat 0 remaining as meaning this recipient is at its limit,
-    // but still allowed to send this one last email..
-    return remaining - 1;
   }
 
   markSent(...idents) {
@@ -88,8 +60,8 @@ class Notifier {
       return;
     }
 
-    const rateLimit = this.rateLimit(address);
-    if (rateLimit < 0) {
+    const rateLimit = this.rateLimit.remaining(address);
+    if (rateLimit <= 0) {
       debug('Ratelimited email: %s is over its rate limit, discarding the notification', address);
       return;
     }
@@ -132,6 +104,7 @@ class Notifier {
         },
       },
     }).promise().then(res => {
+      this.rateLimit.markEvent(address);
       this.markSent(address, subject, content, link, replyTo);
       return res;
     });
