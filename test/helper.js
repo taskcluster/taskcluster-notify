@@ -37,11 +37,6 @@ exports.secrets = new Secrets({
       {env: 'AWS_ACCESS_KEY_ID', cfg: 'aws.accessKeyId'},
       {env: 'AWS_SECRET_ACCESS_KEY', cfg: 'aws.secretAccessKey'},
     ],
-    taskcluster: [
-      {env: 'TASKCLUSTER_ROOT_URL', cfg: 'taskcluster.rootUrl', name: 'rootUrl'},
-      {env: 'TASKCLUSTER_CLIENT_ID', cfg: 'taskcluster.credentials.clientId', name: 'clientId'},
-      {env: 'TASKCLUSTER_ACCESS_TOKEN', cfg: 'taskcluster.credentials.accessToken', name: 'accessToken'},
-    ],
   },
   load: exports.load,
 });
@@ -73,6 +68,8 @@ exports.withSQS = (mock, skipping) => {
     if (skipping()) {
       return;
     }
+
+    const cfg = await exports.load('cfg');
 
     if (mock) {
       sqs = new MockSQS();
@@ -153,6 +150,8 @@ exports.withSES = (mock, skipping) => {
     if (skipping()) {
       return;
     }
+
+    const cfg = await exports.load('cfg');
 
     if (mock) {
       ses = new MockSES();
