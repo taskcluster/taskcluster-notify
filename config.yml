@@ -19,7 +19,7 @@ defaults:
         - canceled
         - deadline-exceeded
 
-  taskcluster:
+  taskcluster: 
     rootUrl:          !env TASKCLUSTER_ROOT_URL
     credentials:
       clientId:       !env TASKCLUSTER_CLIENT_ID
@@ -42,11 +42,28 @@ defaults:
     apiVersion:       2014-01-01
 
   pulse:
-    username:         !env PULSE_USERNAME
-    password:         !env PULSE_PASSWORD
-    hostname:         !env PULSE_HOSTNAME
-    vhost:            !env PULSE_VHOST
-
+    getCredentialsType:        !env PULSE_GET_CREDENTIALS_TYPE
+    namespace:                 !env PULSE_NAMESPACE
+    pulseCredentials:
+      username:                !env PULSE_USERNAME
+      password:                !env PULSE_PASSWORD
+      hostname:                !env PULSE_HOSTNAME
+      vhost:                   !env PULSE_VHOST
+    connectionStringCredentials: !env PULSE_CONNECTION_STRING
+    claimedCredentials:
+      namespace:               !env PULSE_NAMESPACE
+      expiresAfter:            !env PULSE_EXPIRES_AFTER
+      contact:                 !env PULSE_CONTACT
+      rootUrl:                 !env TASKCLUSTER_ROOT_URL
+      credentials:
+        clientId:              !env TASKCLUSTER_CLIENT_ID
+        accessToken:           !env TASKCLUSTER_ACCESS_TOKEN
+    client:
+      namespace:               !env PULSE_NAMESPACE
+      recycleInterval:         !env PULSE_CLIENT_RECYCLE_INTERVAL
+      retirementDelay:         !env PULSE_CLIENT_RETIREMENT_DELAY
+      minReconnectionInterval: !env PULSE_CLIENT_MIN_RECONNECTION_INTERVAL
+      
   irc:
     server:           !env IRC_SERVER
     nick:             !env IRC_NICK
