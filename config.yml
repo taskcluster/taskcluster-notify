@@ -42,14 +42,7 @@ defaults:
     apiVersion:       2014-01-01
 
   pulse:
-    getCredentialsType:        !env PULSE_GET_CREDENTIALS_TYPE
     namespace:                 !env PULSE_NAMESPACE
-    pulseCredentials:
-      username:                !env PULSE_USERNAME
-      password:                !env PULSE_PASSWORD
-      hostname:                !env PULSE_HOSTNAME
-      vhost:                   !env PULSE_VHOST
-    connectionStringCredentials: !env PULSE_CONNECTION_STRING
     claimedCredentials:
       namespace:               !env PULSE_NAMESPACE
       expiresAfter:            !env PULSE_EXPIRES_AFTER

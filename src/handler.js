@@ -27,12 +27,10 @@ class Handler {
       queueEvents.taskException(`route.${routePrefix}.#.on-exception.#`),
       queueEvents.taskException(`route.${routePrefix}.#.on-any.#`),
     ];
-    debug('fff');
-    debug(this.bindings);
   }
 
   async listen() {
-    const pq = await consume({client:this.pulseClient, bindings:this.bindings,
+    this.pq = await consume({client:this.pulseClient, bindings:this.bindings,
       queueName:this.queueName},
     (message) => this.monitor.timedHandler('notification', this.onMessage(message)));
   }
