@@ -8,8 +8,8 @@ const {consume} = require('taskcluster-lib-pulse');
 /** Handler listening for tasks that carries notifications */
 class Handler {
   constructor({notifier, monitor, routePrefix, ignoreTaskReasonResolved, pulseClient, queue, 
-    testing, queueEvents, queueName}) {
-    
+    queueEvents, queueName}) {
+
     this.queue = queue;
     this.notifier = notifier;
     this.monitor = monitor;
@@ -17,7 +17,6 @@ class Handler {
     this.ignoreTaskReasonResolved = ignoreTaskReasonResolved;
 
     this.pulseClient = pulseClient;
-    this.testing = testing;
     this.queueName = queueName;
     this.bindings = [
       queueEvents.taskCompleted(`route.${routePrefix}.#.on-completed.#`),
@@ -30,8 +29,11 @@ class Handler {
   }
 
   async listen() {
-    this.pq = await consume({client:this.pulseClient, bindings:this.bindings,
-      queueName:this.queueName},
+    this.pq = await consume({
+      client: this.pulseClient,
+      bindings: this.bindings,
+      queueName: this.queueName,
+    },
     (message) => this.monitor.timedHandler('notification', this.onMessage(message)));
   }
 

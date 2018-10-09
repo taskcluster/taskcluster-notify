@@ -79,9 +79,17 @@ const load = loader({
   pulseClient: {
     requires: ['cfg', 'monitor'],
     setup: ({cfg, monitor}) => {
-      const {namespace, recycleInterval, retirementDelay, minReconnectionInterval} = cfg.pulse.client;
-      return new Client({namespace, recycleInterval, retirementDelay, minReconnectionInterval,
-        monitor, credentials: claimedCredentials(cfg.pulse.claimedCredentials),
+      const {namespace, expiresAfter, contact} = cfg.pulse;
+      const {rootUrl, credentials} = cfg.taskcluster;
+      return new Client({
+        namespace,
+        monitor,
+        credentials: claimedCredentials({
+          rootUrl,
+          credentials,
+          namespace,
+          expiresAfter,
+          contact}),
       });
     },
   },
@@ -168,7 +176,7 @@ const load = loader({
 
   handler: {
     requires: ['profile', 'cfg', 'monitor', 'notifier', 'pulseClient', 'queue', 'queueEvents'],
-    setup: async ({profile, cfg, monitor, notifier, pulseClient, queue, queueEvents}) => {
+    setup: async ({cfg, monitor, notifier, pulseClient, queue, queueEvents}) => {
       let handler = new Handler({
         notifier,
         monitor:                  monitor.prefix('handler'),
@@ -176,7 +184,6 @@ const load = loader({
         ignoreTaskReasonResolved: cfg.app.ignoreTaskReasonResolved,
         queue,
         queueEvents,
-        testing:                  profile === 'test',
         pulseClient,
         queueName:                cfg.app.listenerQueueName,
       });
