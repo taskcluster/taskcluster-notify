@@ -23,6 +23,7 @@ class Notifier {
     this.sqs = options.sqs;
     this.rateLimit = options.rateLimit;
     this.queueName = this.options.queueName;
+    this.sender = options.sourceEmail;
 
     const transport = nodemailer.createTransport({
       SES: options.ses,
@@ -95,6 +96,7 @@ class Notifier {
 
     const res = await this.emailer.send({
       message: {
+        from: this.sender,
         to: address,
       },
       template: template || 'simple',
